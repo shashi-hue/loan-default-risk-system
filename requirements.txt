@@ -2,10 +2,13 @@ pandas
 numpy
 scikit-learn
 xgboost
-lightgbm
 matplotlib
 seaborn
 shap
 lime
+optuna
+datetime
+flask
+joblib
 streamlit
-imbalanced-learn
+plotly

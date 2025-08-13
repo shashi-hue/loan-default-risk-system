@@ -6,7 +6,6 @@ __pycache__/
 # Ignore data and models
 data/raw/
 data/processed/
-models/
 *.csv
 *.zip
 *.json

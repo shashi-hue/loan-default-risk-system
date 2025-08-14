@@ -1,6 +1,7 @@
 import sys
 import os
 from pathlib import Path
+import gdown
 
 # Get the repository root directory (go up from dashboard/ to repo root)
 repo_root = Path(__file__).parent.parent
@@ -59,28 +60,39 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-
-print("=== DEBUG: Models folder contents ===")
-print(os.listdir("models") if os.path.exists("models") else "No models dir found")
 @st.cache_resource
 def load_model_and_data():
     """Load model and sample data with caching"""
     try:
         with st.spinner("Loading model and initializing SHAP explainer..."):
             explainer = LoanExplainer()
-        # Load a sample of data for portfolio analysis
-        X_sample, y_sample = load_test_data("data/processed/model_df.parquet")
+        
+        # Path to test data
+        test_path = "data/processed/model_df.parquet"
+        
+        # Google Drive file ID (same as in explainability.py)
+        file_id = "1xypiRV2aUU2jXEUG2k8yqsBwToyVFCqP"
+        
+        # Download if missing
+        if not os.path.exists(test_path):
+            os.makedirs(os.path.dirname(test_path), exist_ok=True)
+            st.info("Downloading test data from Google Drive...")
+            gdown.download(f"https://drive.google.com/uc?id={file_id}", test_path, quiet=False)
+        
+        # Load data
+        X_sample, y_sample = load_test_data(test_path)
         
         # Take a reasonable sample for dashboard performance
         sample_size = min(5000, len(X_sample))
         
-        # CORRECTED: Sample both X and y together to maintain alignment
+        # Sample both X and y together to maintain alignment
         sample_indices = X_sample.sample(sample_size, random_state=42).index
         X_sample = X_sample.loc[sample_indices].reset_index(drop=True)
         if y_sample is not None:
             y_sample = y_sample.loc[sample_indices].reset_index(drop=True)
             
         return explainer, X_sample, y_sample
+    
     except Exception as e:
         st.error(f"Error loading model: {str(e)}")
         st.info("Please ensure model files are available in the 'models/' directory")

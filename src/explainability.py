@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from typing import Tuple, Dict, List
 import warnings
+import os
+import gdown
 warnings.filterwarnings('ignore')
 
 from pathlib import Path
@@ -220,8 +222,17 @@ class LoanExplainer:
 
 
 # Convenience functions for backward compatibility
-def load_test_data(test_path: str) -> Tuple[pd.DataFrame]:
-    """Load test data"""
+def load_test_data(test_path: str = "data/processed/model_df.parquet") -> Tuple[pd.DataFrame]:
+    """Load test data, downloading from Google Drive if not present"""
+    
+    # Google Drive file ID
+    file_id = "1xypiRV2aUU2jXEUG2k8yqsBwToyVFCqP"
+    
+    if not os.path.exists(test_path):
+        os.makedirs(os.path.dirname(test_path), exist_ok=True)
+        print(f"Downloading test data from Google Drive to {test_path} ...")
+        gdown.download(f"https://drive.google.com/uc?id={file_id}", test_path, quiet=False)
+
     df = pd.read_parquet(test_path)
     X = df.drop(columns=['loan_status']) if "loan_status" in df.columns else df
     y = df["loan_status"] if "loan_status" in df.columns else None
@@ -236,7 +247,7 @@ if __name__ == "__main__":
     explainer = create_explainer()
     
     # Load some test data
-    X_test, y_test = load_test_data("data/processed/model_df.parquet")
+    X_test, y_test = load_test_data()
     
     # Example: explain a single loan
     sample_loan = X_test.iloc[[0]]  # First loan

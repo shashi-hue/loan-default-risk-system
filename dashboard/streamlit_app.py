@@ -13,7 +13,16 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from src.explainability import LoanExplainer, load_test_data
+try:
+    from src.explainability import LoanExplainer, load_test_data
+except Exception as e:
+    import traceback
+    print("IMPORT ERROR:", e)
+    traceback.print_exc()
+    import streamlit as st
+    st.error(f"Startup import error: {e}")
+    st.stop()
+
 import warnings
 warnings.filterwarnings('ignore')
 

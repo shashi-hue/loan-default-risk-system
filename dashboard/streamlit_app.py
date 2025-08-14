@@ -1,10 +1,10 @@
 import sys
 import os
+from pathlib import Path
 
-# Add the project root to sys.path
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
+# Get the repository root directory
+repo_root = Path(__file__).parent.parent  # Go up from dashboard/ to repo root
+sys.path.insert(0, str(repo_root))
 
 import streamlit as st
 import pandas as pd

@@ -14,6 +14,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import traceback
+import os
 try:
     from src.explainability import LoanExplainer, load_test_data
 except Exception as e:
@@ -58,6 +59,9 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+
+print("=== DEBUG: Models folder contents ===")
+print(os.listdir("models") if os.path.exists("models") else "No models dir found")
 @st.cache_resource
 def load_model_and_data():
     """Load model and sample data with caching"""

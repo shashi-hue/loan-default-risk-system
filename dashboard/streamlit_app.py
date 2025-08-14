@@ -2,9 +2,10 @@ import sys
 import os
 from pathlib import Path
 
-# Get the repository root directory
-repo_root = Path(__file__).parent.parent  # Go up from dashboard/ to repo root
-sys.path.insert(0, str(repo_root))
+# Get the repository root directory (go up from dashboard/ to repo root)
+repo_root = Path(__file__).parent.parent
+os.chdir(repo_root)  # Change working directory to repo root
+sys.path.insert(0, str(repo_root))  # Add repo root to Python path
 
 import streamlit as st
 import pandas as pd

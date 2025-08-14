@@ -8,16 +8,18 @@ from typing import Tuple, Dict, List
 import warnings
 warnings.filterwarnings('ignore')
 
+from pathlib import Path
+
 class LoanExplainer:
-    def __init__(self, model_path: str = "models/model_xgb.joblib", 
-                 cal_model_path: str = "models/model_xgb_calibrated.joblib",
-                 threshold_path: str = "models/model_threshold.joblib"):
-        """Initialize the explainer with model artifacts"""
-        print("Loading model artifacts...")
-        self.model = joblib.load(model_path)
-        self.cal_model = joblib.load(cal_model_path)
+    def __init__(self,
+                 model_path: str = None,
+                 cal_model_path: str = None,
+                 threshold_path: str = None):
+        base_dir = Path(__file__).parent.parent  # repo root
+        self.model = joblib.load(model_path or base_dir / "models/model_xgb.joblib")
+        self.cal_model = joblib.load(cal_model_path or base_dir / "models/model_xgb_calibrated.joblib")
         self.feature_names = None
-        self.threshold = joblib.load(threshold_path)
+        self.threshold = joblib.load(threshold_path or base_dir / "models/model_threshold.joblib")
         self.explainer = None
         self.shap_values_cache = {}
         

@@ -13,13 +13,11 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import traceback
 try:
     from src.explainability import LoanExplainer, load_test_data
 except Exception as e:
-    import traceback
     tb_str = ''.join(traceback.format_exception(type(e), e, e.__traceback__))
-    st.error(f"Startup import error:\n```\n{tb_str}\n```")
-    st.stop()tb_str = ''.join(traceback.format_exception(type(e), e, e.__traceback__))
     st.error(f"Startup import error:\n```\n{tb_str}\n```")
     st.stop()
 

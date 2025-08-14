@@ -1,6 +1,5 @@
 # Ignore virtual environments and system files
 venv/
-__pycache__/
 .ipynb_checkpoints/
 
 # Ignore data and models

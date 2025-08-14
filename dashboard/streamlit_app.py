@@ -17,10 +17,10 @@ try:
     from src.explainability import LoanExplainer, load_test_data
 except Exception as e:
     import traceback
-    print("IMPORT ERROR:", e)
-    traceback.print_exc()
-    import streamlit as st
-    st.error(f"Startup import error: {e}")
+    tb_str = ''.join(traceback.format_exception(type(e), e, e.__traceback__))
+    st.error(f"Startup import error:\n```\n{tb_str}\n```")
+    st.stop()tb_str = ''.join(traceback.format_exception(type(e), e, e.__traceback__))
+    st.error(f"Startup import error:\n```\n{tb_str}\n```")
     st.stop()
 
 import warnings

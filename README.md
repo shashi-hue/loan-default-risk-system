@@ -4,6 +4,8 @@ A comprehensive machine learning project to predict loan defaults using the Lend
 
 **Bad rate**: The proportion of loans that have become defaulted, indicating the percentage of loans that are unlikely to be fully repaid.
 
+**Note**: The application is currently experiencing deployment challenges(Memory limitations, container launch timeout) on cloud platforms.While the app runs perfectly in local development environments. Will be fixed soon..
+
 ## 📖 Project Overview
 
 This project tackles the challenge of predicting loan defaults in peer-to-peer lending. Rather than just building a model, I focused on creating a complete, production-ready system that includes:

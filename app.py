@@ -4,7 +4,7 @@ from pathlib import Path
 import gdown
 
 # Get the repository root directory (go up from dashboard/ to repo root)
-repo_root = Path(__file__).parent.parent
+repo_root = Path(__file__).parent
 os.chdir(repo_root)  # Change working directory to repo root
 sys.path.insert(0, str(repo_root))  # Add repo root to Python path
 

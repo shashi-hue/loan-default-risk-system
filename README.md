@@ -1,6 +1,8 @@
 # 🏦 Lending Club Loan Default Prediction
 
-A comprehensive machine learning project to predict loan defaults using the Lending Club dataset, with end-to-end model development, explainability, and interactive dashboard deployment.
+A comprehensive machine learning project to predict loan defaults using the Lending Club dataset and optimized threshold based on target Bad-rate(10%), with end-to-end model development, explainability, and interactive dashboard deployment.
+
+**Bad rate**: The proportion of loans that have become defaulted, indicating the percentage of loans that are unlikely to be fully repaid.
 
 ## 📖 Project Overview
 

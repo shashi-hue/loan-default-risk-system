@@ -55,10 +55,17 @@ Clear geographic patterns emerge, with Mississippi (26% default rate) vs DC (13%
 ### Model Performance & Calibration
 ![Calibration Curve](images/calibration_curve.png)
 ![PR Curve](images/pr_curve.png)
+
+### Optuna Hyperparameters optimization history
+
 ![Optuna Optimization](images/optuna.png)
 
-### Model Explainability
+### Model Explainability(Global)
+
 ![Global SHAP](images/global_shap.png)
+
+### Sample Local Explainability
+
 ![Sample Local SHAP](images/sample_local_shap.png)
 
 ### Business Optimization

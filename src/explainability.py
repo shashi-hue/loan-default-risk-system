@@ -228,10 +228,10 @@ def load_test_data(test_path: str = "data/processed/model_df.parquet") -> Tuple[
     # Google Drive file ID
     file_id = "1xypiRV2aUU2jXEUG2k8yqsBwToyVFCqP"
     
-    #if not os.path.exists(test_path):
-    os.makedirs(os.path.dirname(test_path), exist_ok=True)
-    print(f"Downloading test data from Google Drive to {test_path} ...")
-    gdown.download(f"https://drive.google.com/uc?id={file_id}", test_path, quiet=False)
+    if not os.path.exists(test_path):
+        os.makedirs(os.path.dirname(test_path), exist_ok=True)
+        print(f"Downloading test data from Google Drive to {test_path} ...")
+        gdown.download(f"https://drive.google.com/uc?id={file_id}", test_path, quiet=False)
 
     df = pd.read_parquet(test_path)
     X = df.drop(columns=['loan_status']) if "loan_status" in df.columns else df

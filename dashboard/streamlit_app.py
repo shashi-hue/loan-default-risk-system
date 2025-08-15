@@ -74,10 +74,9 @@ def load_model_and_data():
         file_id = "1xypiRV2aUU2jXEUG2k8yqsBwToyVFCqP"
         
         # Download if missing
-        #if not os.path.exists(test_path):
-        os.makedirs(os.path.dirname(test_path), exist_ok=True)
-        st.info("Downloading test data from Google Drive...")
-        gdown.download(f"https://drive.google.com/uc?id={file_id}", test_path, quiet=False)
+        if not os.path.exists(test_path):
+            os.makedirs(os.path.dirname(test_path), exist_ok=True)
+            gdown.download(f"https://drive.google.com/uc?id={file_id}", test_path, quiet=False)
         
         # Load data
         X_sample, y_sample = load_test_data(test_path)

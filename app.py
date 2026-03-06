@@ -63,39 +63,47 @@ st.markdown("""
 @st.cache_resource
 def load_model_and_data():
     """Load model and sample data with caching"""
+    explainer = None
+    X_sample = None
+    y_sample = None
+
+    # Step 1: Load model (always works if model files are in models/)
     try:
         with st.spinner("Loading model and initializing SHAP explainer..."):
             explainer = LoanExplainer()
-        
-        # Path to test data
-        test_path = "data/processed/model_df.parquet"
-        
-        # Google Drive file ID (same as in explainability.py)
-        file_id = "1xypiRV2aUU2jXEUG2k8yqsBwToyVFCqP"
-        
-        # Download if missing
-        if not os.path.exists(test_path):
-            os.makedirs(os.path.dirname(test_path), exist_ok=True)
-            gdown.download(f"https://drive.google.com/uc?id={file_id}", test_path, quiet=False)
-        
-        # Load data
-        X_sample, y_sample = load_test_data(test_path)
-        
-        # Take a reasonable sample for dashboard performance
-        sample_size = min(5000, len(X_sample))
-        
-        # Sample both X and y together to maintain alignment
-        sample_indices = X_sample.sample(sample_size, random_state=42).index
-        X_sample = X_sample.loc[sample_indices].reset_index(drop=True)
-        if y_sample is not None:
-            y_sample = y_sample.loc[sample_indices].reset_index(drop=True)
-            
-        return explainer, X_sample, y_sample
-    
     except Exception as e:
         st.error(f"Error loading model: {str(e)}")
         st.info("Please ensure model files are available in the 'models/' directory")
         return None, None, None
+
+    # Step 2: Download and load test data (may fail on cloud due to gdown limits)
+    try:
+        test_path = "data/processed/model_df.parquet"
+        file_id = "18njc7poEDmRuH0_W-6wGNQL78OvgBAIb"
+
+        if not os.path.exists(test_path):
+            os.makedirs(os.path.dirname(test_path), exist_ok=True)
+            gdown.download(
+                f"https://drive.google.com/uc?id={file_id}",
+                test_path,
+                quiet=False,
+                fuzzy=True
+            )
+
+        X_sample, y_sample = load_test_data(test_path)
+
+        sample_size = min(5000, len(X_sample))
+        sample_indices = X_sample.sample(sample_size, random_state=42).index
+        X_sample = X_sample.loc[sample_indices].reset_index(drop=True)
+        if y_sample is not None:
+            y_sample = y_sample.loc[sample_indices].reset_index(drop=True)
+    except Exception as e:
+        st.warning(f"⚠️ Could not load test data: {str(e)}")
+        st.info("📊 Individual loan risk assessment is still fully available! Navigate to '🔍 Risk Assessment' in the sidebar.")
+        X_sample = None
+        y_sample = None
+
+    return explainer, X_sample, y_sample
 
 
 def create_kpi_metrics(explainer, X_data):
@@ -837,29 +845,32 @@ def main():
     if page == "📊 Executive Dashboard":
         st.header("Executive Dashboard")
         
-        # KPI Metrics
-        risk_dist = create_kpi_metrics(explainer, X_sample)
-        
-        st.divider()
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            # Risk distribution plot
-            risk_fig = plot_risk_distribution(X_sample, explainer)
-            st.plotly_chart(risk_fig, use_container_width=True)
+        if X_sample is None:
+            st.info("📊 Test dataset is not available. This feature requires portfolio data. Please try the '🔍 Risk Assessment' page for individual loan analysis.")
+        else:
+            # KPI Metrics
+            risk_dist = create_kpi_metrics(explainer, X_sample)
             
-        with col2:
-            # Risk percentiles
-            st.subheader("Risk Percentiles")
-            perc_df = pd.DataFrame.from_dict(risk_dist['percentiles'], orient='index', columns=['Percentile'])
-            perc_df.index.name = 'Level'
-            st.dataframe(perc_df, use_container_width=True)
+            st.divider()
             
-            # Portfolio summary
-            st.subheader("Portfolio Summary")
-            st.metric("Mean Risk", f"{risk_dist['mean_risk']:.3f}")
-            st.metric("Risk Std Dev", f"{risk_dist['std_risk']:.3f}")
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                # Risk distribution plot
+                risk_fig = plot_risk_distribution(X_sample, explainer)
+                st.plotly_chart(risk_fig, use_container_width=True)
+                
+            with col2:
+                # Risk percentiles
+                st.subheader("Risk Percentiles")
+                perc_df = pd.DataFrame.from_dict(risk_dist['percentiles'], orient='index', columns=['Percentile'])
+                perc_df.index.name = 'Level'
+                st.dataframe(perc_df, use_container_width=True)
+                
+                # Portfolio summary
+                st.subheader("Portfolio Summary")
+                st.metric("Mean Risk", f"{risk_dist['mean_risk']:.3f}")
+                st.metric("Risk Std Dev", f"{risk_dist['std_risk']:.3f}")
     
     elif page == "🎯 Risk Assessment":
         st.header("Individual Loan Risk Assessment")
@@ -870,78 +881,87 @@ def main():
             show_individual_assessment(explainer, X_sample)
         
         with tab2:
-            show_batch_analysis(explainer, X_sample, y_sample)
+            if X_sample is None:
+                st.info("📊 Test dataset is not available. This feature requires portfolio data. Please try the '🔍 Risk Assessment' page for individual loan analysis.")
+            else:
+                show_batch_analysis(explainer, X_sample, y_sample)
     
     elif page == "🔍 Explainability":
         st.header("Model Explainability & Feature Analysis")
         
-        tab1, tab2 = st.tabs(["Feature Importance", "Feature Interactions"])
-        
-        with tab1:
-            st.subheader("Global Feature Importance")
+        if X_sample is None:
+            st.info("📊 Test dataset is not available. This feature requires portfolio data. Please try the '🔍 Risk Assessment' page for individual loan analysis.")
+        else:
+            tab1, tab2 = st.tabs(["Feature Importance", "Feature Interactions"])
             
-            # Get feature importance
-            importance_df = explainer.get_feature_importance(X_sample, top_n=20)
-            
-            # Plot importance
-            fig = px.bar(importance_df, x='importance', y='feature', orientation='h',
-                        title="Top 20 Most Important Features")
-            fig.update_yaxes(autorange="reversed")
-            st.plotly_chart(fig, use_container_width=True)
-            
-            # Show SHAP summary plot
-            st.subheader("SHAP Summary Plot")
-            try:
-                shap_fig = explainer.create_summary_plot(X_sample.head(500))
-                st.pyplot(shap_fig, use_container_width=True)
-            except Exception as e:
-                st.error(f"Error creating SHAP plot: {str(e)}")
-        
-        with tab2:
-            st.subheader("Feature Dependence Analysis")
-            
-            # Feature selection
-            selected_feature = st.selectbox(
-                "Select Feature for Dependence Analysis:",
-                options=explainer.feature_names[:20]  # Top 20 for performance
-            )
-            
-            if st.button("Generate Dependence Plot"):
+            with tab1:
+                st.subheader("Global Feature Importance")
+                
+                # Get feature importance
+                importance_df = explainer.get_feature_importance(X_sample, top_n=20)
+                
+                # Plot importance
+                fig = px.bar(importance_df, x='importance', y='feature', orientation='h',
+                            title="Top 20 Most Important Features")
+                fig.update_yaxes(autorange="reversed")
+                st.plotly_chart(fig, use_container_width=True)
+                
+                # Show SHAP summary plot
+                st.subheader("SHAP Summary Plot")
                 try:
-                    dep_fig = explainer.create_dependence_plot(X_sample.head(500), selected_feature)
-                    st.pyplot(dep_fig, use_container_width=True)
+                    shap_fig = explainer.create_summary_plot(X_sample.head(500))
+                    st.pyplot(shap_fig, use_container_width=True)
                 except Exception as e:
-                    st.error(f"Error creating dependence plot: {str(e)}")
+                    st.error(f"Error creating SHAP plot: {str(e)}")
+            
+            with tab2:
+                st.subheader("Feature Dependence Analysis")
+                
+                # Feature selection
+                selected_feature = st.selectbox(
+                    "Select Feature for Dependence Analysis:",
+                    options=explainer.feature_names[:20]  # Top 20 for performance
+                )
+                
+                if st.button("Generate Dependence Plot"):
+                    try:
+                        dep_fig = explainer.create_dependence_plot(X_sample.head(500), selected_feature)
+                        st.pyplot(dep_fig, use_container_width=True)
+                    except Exception as e:
+                        st.error(f"Error creating dependence plot: {str(e)}")
     
     elif page == "⚖️ Portfolio Optimizer":
         st.header("Portfolio Optimization & Threshold Tuning")
         
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.subheader("Current Settings")
-            st.metric("Current Threshold", explainer.threshold)
+        if X_sample is None:
+            st.info("📊 Test dataset is not available. This feature requires portfolio data. Please try the '🔍 Risk Assessment' page for individual loan analysis.")
+        else:
+            col1, col2 = st.columns(2)
             
-            # Threshold slider (for visualization only)
-            new_threshold = st.slider(
-                "Explore Threshold Impact:",
-                min_value=0.1, max_value=0.5, 
-                value=float(explainer.threshold), step=0.01
-            )
+            with col1:
+                st.subheader("Current Settings")
+                st.metric("Current Threshold", explainer.threshold)
+                
+                # Threshold slider (for visualization only)
+                new_threshold = st.slider(
+                    "Explore Threshold Impact:",
+                    min_value=0.1, max_value=0.5, 
+                    value=float(explainer.threshold), step=0.01
+                )
+                
+                # Calculate impact of new threshold
+                probabilities = explainer.cal_model.predict_proba(X_sample)[:, 1]
+                new_approval_rate = (probabilities <= new_threshold).mean()
+                approved_loans = probabilities[probabilities <= new_threshold]
+                new_bad_rate = approved_loans.mean() if len(approved_loans) > 0 else 0
+                
+                st.metric("Simulated Approval Rate", f"{new_approval_rate:.1%}")
+                st.metric("Simulated Bad Rate", f"{new_bad_rate:.3f}")
             
-            # Calculate impact of new threshold
-            probabilities = explainer.cal_model.predict_proba(X_sample)[:, 1]
-            new_approval_rate = (probabilities <= new_threshold).mean()
-            approved_loans = probabilities[probabilities <= new_threshold]
-            new_bad_rate = approved_loans.mean() if len(approved_loans) > 0 else 0
-            
-            st.metric("Simulated Approval Rate", f"{new_approval_rate:.1%}")
-            st.metric("Simulated Bad Rate", f"{new_bad_rate:.3f}")
-        
-        with col2:
-            # Threshold analysis plot
-            threshold_fig = plot_threshold_analysis(explainer, X_sample)
-            st.plotly_chart(threshold_fig, use_container_width=True)
+            with col2:
+                # Threshold analysis plot
+                threshold_fig = plot_threshold_analysis(explainer, X_sample)
+                st.plotly_chart(threshold_fig, use_container_width=True)
     
     # Footer
     st.divider()

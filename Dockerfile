@@ -44,8 +44,7 @@ COPY src/explainability.py src/explainability.py
 COPY models/ models/
 
 # Configure Streamlit for container deployment
-ENV STREAMLIT_SERVER_PORT=8501 \
-    STREAMLIT_SERVER_ADDRESS=0.0.0.0 \
+ENV STREAMLIT_SERVER_ADDRESS=0.0.0.0 \
     STREAMLIT_SERVER_HEADLESS=true \
     STREAMLIT_BROWSER_GATHER_USAGE_STATS=false \
     PYTHONUNBUFFERED=1 \
@@ -55,6 +54,6 @@ ENV STREAMLIT_SERVER_PORT=8501 \
 EXPOSE 8501
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8501/_stcore/health')" || exit 1
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:${PORT:-8501}/_stcore/health')" || exit 1
 
-ENTRYPOINT ["streamlit", "run", "app.py"]
+CMD streamlit run app.py --server.port=${PORT:-8501}

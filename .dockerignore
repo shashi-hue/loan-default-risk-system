@@ -1,0 +1,51 @@
+# Version control
+.git
+.gitattributes
+.gitignore
+
+# Documentation
+README.md
+images/
+
+# Jupyter notebooks (98% of repo size)
+notebooks/
+*.ipynb
+
+# Raw data
+data/raw/
+
+# Processed data (174MB LFS file — downloaded at runtime via gdown)
+data/processed/
+
+# Training-only source files
+src/data_processing.py
+src/model_training.py
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+src/__pycache__/
+.ipynb_checkpoints/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE files
+.vscode/
+.idea/
+
+# Docker files (don't copy themselves)
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Other
+*.log
+requirements.txt

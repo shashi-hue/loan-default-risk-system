@@ -4,7 +4,7 @@ A comprehensive machine learning project to predict loan defaults using the Lend
 
 **Bad rate**: The proportion of loans that have become defaulted, indicating the percentage of loans that are unlikely to be fully repaid.
 
-**Note**: The application is currently experiencing deployment challenges(Memory limitations, container launch timeout) on cloud platforms.While the app runs perfectly in local development environments. Will be fixed soon..
+> **🚀 Live Demo**: [Try the app on Hugging Face Spaces](https://shashi-hue-loan-default-risk-system.hf.space/)
 
 ## 📖 Project Overview
 
@@ -30,6 +30,39 @@ Using the **Lending Club Dataset** (2007-2018), publicly available and widely us
 - 2.2M+ loan records with 150+ features
 - Comprehensive borrower information, credit history, and loan terms
 - Focus on completed loans only (Fully Paid vs Charged Off/Default)
+
+## 📁 Project Structure
+
+```
+loan-default-risk-system/
+├── app.py                          # Streamlit dashboard (main entry point)
+├── src/
+│   ├── __init__.py
+│   ├── explainability.py           # SHAP explainer + model inference
+│   ├── data_processing.py          # Feature engineering pipeline
+│   └── model_training.py           # XGBoost training script
+├── models/
+│   ├── model_xgb.joblib            # Trained XGBoost model
+│   ├── model_xgb_calibrated.joblib # Calibrated model (isotonic)
+│   ├── model_threshold.joblib      # Optimized decision threshold
+│   ├── feature_names.joblib        # Feature name list
+│   └── model_training_metadata.joblib
+├── notebooks/
+│   ├── 01_EDA.ipynb                # Exploratory Data Analysis
+│   ├── 02_baseline_model.ipynb     # Logistic Regression & Decision Tree
+│   ├── 03_Advance_feature_engineering.ipynb
+│   ├── 04_Advance_modelling.ipynb  # XGBoost + Optuna optimization
+│   └── 05_Evaluation.ipynb         # Calibration & threshold tuning
+├── data/
+│   └── processed/
+│       └── model_df.parquet        # Processed dataset (Git LFS)
+├── images/                         # Visualizations for README
+├── Dockerfile                      # Multi-stage Docker build
+├── .dockerignore
+├── requirements.txt                # Full dependencies
+├── requirements-docker.txt         # Slim runtime dependencies
+└── README.md
+```
 
 ## 🔍 Key Visualizations & Insights
 
@@ -75,7 +108,7 @@ Clear geographic patterns emerge, with Mississippi (26% default rate) vs DC (13%
 
 ## 🚀 Project Workflow
 
-### 1. **Data Processing & EDA** (`01_eda.ipynb`)
+### 1. **Data Processing & EDA** (`01_EDA.ipynb`)
 - Comprehensive exploration of 150+ features
 - Identified key risk drivers and surprising patterns
 - Feature correlation analysis and missing value treatment
@@ -100,16 +133,15 @@ Clear geographic patterns emerge, with Mississippi (26% default rate) vs DC (13%
 - Business-focused bad rate optimization  
 - SHAP explainability for regulatory compliance
 
-
-
 ## 🔧 Tech Stack
 
 - **Data Processing**: Pandas, NumPy
 - **Machine Learning**: XGBoost, Scikit-learn, Optuna
 - **Explainability**: SHAP
 - **Visualization**: Matplotlib, Seaborn, Plotly
-- **Deployment**: Streamlit
-- **Environment**: Python 3.8+
+- **Dashboard**: Streamlit
+- **Deployment**: Docker, Hugging Face Spaces
+- **Environment**: Python 3.11+
 
 ## 📈 Model Features
 
@@ -151,6 +183,39 @@ The Streamlit dashboard provides:
 - **Approval Rate**: 50% of applications approved
 - **Expected Risk**: Quantified financial risk assessment
 
+## 🚀 Deployment
+
+### Live Demo
+
+The app is deployed on **Hugging Face Spaces** (free tier, 16GB RAM):
+
+> 🔗 [https://huggingface.co/spaces/YOUR_HF_USERNAME/loan-default-risk-system](https://huggingface.co/spaces/YOUR_HF_USERNAME/loan-default-risk-system)
+
+### Run Locally
+
+```bash
+git clone https://github.com/shashi-hue/loan-default-risk-system.git
+cd loan-default-risk-system
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+### Run with Docker
+
+```bash
+docker build -t loan-risk-app .
+docker run -p 8501:8501 loan-risk-app
+```
+
+### Deploy to Hugging Face Spaces
+
+1. Create a new Space at [huggingface.co/new-space](https://huggingface.co/new-space) with **Docker** SDK
+2. Clone the Space and copy: `app.py`, `src/`, `models/`, `Dockerfile`, `requirements-docker.txt`
+3. Change the port in `Dockerfile` from `8501` to `7860` (HF requirement)
+4. Push — HF auto-builds and deploys
+
+> **Note**: The app downloads ~174MB of test data from Google Drive on first launch. The Google Drive file must have "Anyone with the link" sharing permission enabled.
+
 ## 🚨 Important Notes
 
 - **Model Limitations**: This model is trained on historical data (2007-2018) and may not reflect current economic conditions
@@ -166,8 +231,6 @@ Contributions are welcome! Please feel free to do so.
 
 - **Claude AI** provided valuable assistance in developing the Streamlit dashboard and some explainability components
 - **Lending Club** for making their historical data publicly available
-
-
 
 ---
 

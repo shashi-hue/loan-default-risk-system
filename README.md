@@ -189,7 +189,7 @@ The Streamlit dashboard provides:
 
 The app is deployed on **Hugging Face Spaces** (free tier, 16GB RAM):
 
-> 🔗 [https://huggingface.co/spaces/YOUR_HF_USERNAME/loan-default-risk-system](https://huggingface.co/spaces/YOUR_HF_USERNAME/loan-default-risk-system)
+> 🔗 [https://huggingface.co/spaces/YOUR_HF_USERNAME/loan-default-risk-system](https://shashi-hue-loan-default-risk-system.hf.space/)
 
 ### Run Locally
 
@@ -207,14 +207,6 @@ docker build -t loan-risk-app .
 docker run -p 8501:8501 loan-risk-app
 ```
 
-### Deploy to Hugging Face Spaces
-
-1. Create a new Space at [huggingface.co/new-space](https://huggingface.co/new-space) with **Docker** SDK
-2. Clone the Space and copy: `app.py`, `src/`, `models/`, `Dockerfile`, `requirements-docker.txt`
-3. Change the port in `Dockerfile` from `8501` to `7860` (HF requirement)
-4. Push — HF auto-builds and deploys
-
-> **Note**: The app downloads ~174MB of test data from Google Drive on first launch. The Google Drive file must have "Anyone with the link" sharing permission enabled.
 
 ## 🚨 Important Notes
 

@@ -189,7 +189,7 @@ The Streamlit dashboard provides:
 
 The app is deployed on **Hugging Face Spaces** (free tier, 16GB RAM):
 
-> 🔗 [https://huggingface.co/spaces/YOUR_HF_USERNAME/loan-default-risk-system](https://shashi-hue-loan-default-risk-system.hf.space/)
+> 🔗 [https://shashi-hue-loan-default-risk-system.hf.space/](https://shashi-hue-loan-default-risk-system.hf.space/)
 
 ### Run Locally
 
